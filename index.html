@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiGraspNet — A Multitask 3D Vision Model for Multi-gripper Robotic Grasping</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --polito-navy:   #002F6C;
+      --polito-blue:   #0052A5;
+      --polito-accent: #0078D7;
+      --polito-light:  #E6EEF8;
+      --white:         #FFFFFF;
+      --grey-50:       #F4F7FB;
+      --grey-200:      #D8E3EF;
+      --grey-500:      #6B839E;
+      --grey-800:      #1A2A3A;
+      --font-display:  'DM Serif Display', Georgia, serif;
+      --font-body:     'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--grey-800);
+      background: var(--white);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    /* ── Navigation ─────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--polito-navy);
+      border-bottom: 3px solid var(--polito-accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 60px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.28);
+    }
+
+    .nav-brand {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-brand span.multi { color: #38B6FF; }
+    .nav-brand span.grasp { color: var(--white); }
+    .nav-brand span.net   { color: #F5A623; }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.18s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    #home {
+      position: relative;
+      overflow: hidden;
+      background: var(--polito-navy);
+      padding: 80px 48px 96px;
+      text-align: center;
+    }
+
+    #home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,
+        transparent 0%, transparent 35%,
+        rgba(0,120,215,0.11) 35%, rgba(0,120,215,0.11) 50%,
+        transparent 50%, transparent 64%,
+        rgba(0,82,165,0.08) 64%, rgba(0,82,165,0.08) 79%,
+        transparent 79%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .project-logo {
+      width: 400px;   /* Doubled from 148px */
+      height: 400px;  /* Doubled from 148px */
+      object-fit: contain;
+      margin: 0 auto 30px;
+      display: block;
+      filter: drop-shadow(0 6px 24px rgba(0,0,0,0.40));
+    }
+
+    h1.project-title {
+      font-family: var(--font-body);
+      font-size: clamp(2.1rem, 4.5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    h1.project-title .multi { color: #38B6FF; }
+    h1.project-title .grasp { color: var(--white); }
+    h1.project-title .net   { color: #F5A623; }
+
+    .project-subtitle {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.62);
+      font-weight: 300;
+      margin-bottom: 40px;
+      letter-spacing: 0.01em;
+    }
+
+    .abstract {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 12px;
+      padding: 28px 36px;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.97rem;
+      line-height: 1.78;
+      text-align: left;
+      margin-bottom: 42px;
+      backdrop-filter: blur(4px);
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 30px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: transform 0.14s, box-shadow 0.14s, background 0.14s, opacity 0.14s;
+      cursor: pointer;
+    }
+
+    .btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--polito-navy);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.30);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.65);
+      transform: translateY(-2px);
+    }
+
+    /* Disabled code button */
+    .btn-disabled {
+      background: transparent;
+      color: rgba(255,255,255,0.38);
+      border: 2px solid rgba(255,255,255,0.15);
+      cursor: not-allowed;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    /* ── Video ──────────────────────────────────────────────────── */
+    #video {
+      background: var(--grey-50);
+      border-top: 1px solid var(--grey-200);
+      border-bottom: 1px solid var(--grey-200);
+      padding: 72px 48px;
+    }
+
+    .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.70rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--polito-accent);
+      margin-bottom: 8px;
+    }
+
+    h2.section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.55rem, 3vw, 2rem);
+      color: var(--polito-navy);
+      margin-bottom: 16px;
+      line-height: 1.25;
+    }
+
+    .video-description {
+      color: var(--grey-500);
+      font-size: 0.94rem;
+      margin-bottom: 32px;
+      max-width: 660px;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0,47,108,0.18);
+      background: #000;
+    }
+
+    .video-wrapper video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── Contact ────────────────────────────────────────────────── */
+    #contact {
+      background: var(--white);
+      padding: 72px 48px;
+    }
+
+    .contact-card {
+      background: var(--polito-light);
+      border: 1px solid var(--grey-200);
+      border-radius: 14px;
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .contact-text h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--polito-navy);
+      margin-bottom: 8px;
+    }
+
+    .contact-text p {
+      color: var(--grey-500);
+      font-size: 0.93rem;
+    }
+
+    .contact-email-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--polito-navy);
+      color: var(--white);
+      padding: 13px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      transition: background 0.18s, transform 0.14s;
+    }
+
+    .contact-email-btn:hover {
+      background: var(--polito-blue);
+      transform: translateY(-1px);
+    }
+
+    .contact-email-btn svg { width: 16px; height: 16px; }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--polito-navy);
+      border-top: 3px solid var(--polito-accent);
+      padding: 56px 48px 40px;
+    }
+
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .footer-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 64px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .inst-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inst-logo a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.82;
+      transition: opacity 0.2s;
+    }
+
+    .inst-logo a:hover { opacity: 1; }
+
+    .inst-logo img {
+      height: 58px;
+      width: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+
+    /* VANDAL logo is small/square — give it slightly more height */
+    .inst-logo.vandal img { height: 54px; }
+
+    .footer-address {
+      text-align: center;
+    }
+
+    .lab-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .footer-address p {
+      font-size: 0.855rem;
+      color: rgba(255,255,255,0.48);
+      line-height: 1.65;
+    }
+
+    .footer-copy {
+      margin-top: 28px;
+      font-size: 0.77rem;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 680px) {
+      nav { padding: 0 20px; }
+      .nav-links { gap: 18px; }
+      #home { padding: 56px 20px 68px; }
+      .abstract { padding: 20px 22px; }
+      #video, #contact { padding: 52px 20px; }
+      footer { padding: 48px 20px 36px; }
+      .contact-card { padding: 28px 24px; }
+      .footer-logos { gap: 36px; }
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--polito-accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#home" class="nav-brand"><span class="multi">Multi<span class="grasp">Grasp<span class="net">Net</span></a>
+
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#video">Video</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section id="home">
+    <div class="hero-inner">
+
+      <img src="Project_logo.png"
+           alt="MultiGraspNet logo"
+           class="project-logo" />
+
+      <h1 class="project-title">
+        <span class="multi">Multi</span><span class="grasp">Grasp</span><span class="net">Net</span>
+      </h1>
+      <p class="project-subtitle">
+        MultiGraspNet — A Multitask 3D Vision Model for Multi-gripper Robotic Grasping
+      </p>
+
+      <div class="abstract">
+        We present <strong>MultiGraspNet</strong>, a novel multi-task 3D deep learning method
+        that predicts feasible poses simultaneously for parallel and vacuum grippers within a
+        unified framework, enabling a single robot to handle both end-effectors. By sharing
+        early-stage features while maintaining gripper-specific refiners, the model effectively
+        leverages complementary information across grasping modalities — with a compact footprint
+        of only <strong>15.75M parameters</strong> and fast inference on a single GPU.
+        Real-world experiments on a single-arm multi-gripper robotic setup demonstrate
+        competitive performance against single-task baselines while reducing computational cost.
+      </div>
+
+      <div class="cta-group">
+        <a href="https://arxiv.org/pdf/2602.06504"
+           target="_blank" rel="noopener noreferrer"
+           class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Paper
+        </a>
+
+        <span class="btn btn-disabled" title="Code will be released soon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166
+              6.839 9.489.5.092.682-.217.682-.482
+              0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342
+              -.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608
+              1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088
+              2.91.832.092-.647.35-1.088.636-1.338
+              -2.22-.253-4.555-1.113-4.555-4.951
+              0-1.093.39-1.988 1.029-2.688
+              -.103-.253-.446-1.272.098-2.65
+              0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844
+              a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.026
+              2.747-1.026.546 1.379.202 2.398.1 2.651
+              .64.7 1.028 1.595 1.028 2.688
+              0 3.848-2.339 4.695-4.566 4.943
+              .359.309.678.919.678 1.852
+              0 1.336-.012 2.415-.012 2.743
+              0 .267.18.578.688.48A10.019 10.019 0 0 0 22 12
+              c0-5.523-4.477-10-10-10z"/>
+          </svg>
+          Code (coming soon)
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="video">
+    <div class="section-inner">
+     
+      <h2 class="section-title">Project Video</h2>
+      <p class="video-description">
+        Overview of the MultiGraspNet project, including the full pipeline
+        and a demo in real-world.
+      </p>
+
+      <div class="video-wrapper">
+        <video controls poster="">
+          <source src="RAL_camera-ready_60.mp4" type="video/mp4" />
+          Your browser does not support the HTML5 video element.
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-inner">
+      <div class="contact-card">
+        <div class="contact-text">
+          <h3>Get in Touch</h3>
+          <p>
+            For questions about the paper, method, or dataset alignment,
+            contact the corresponding author directly.
+          </p>
+        </div>
+        <a href="mailto:stephany.ortuno@polito.it" class="contact-email-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <polyline points="2,4 12,13 22,4"/>
+          </svg>
+          stephany.ortuno@polito.it
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+
+      <div class="footer-logos">
+
+        <div class="inst-logo vandal">
+          <a href="https://vandal.polito.it/" target="_blank" rel="noopener noreferrer"
+             aria-label="VANDAL Laboratory">
+            <img src="logo_vandal.png" alt="VANDAL Lab" />
+          </a>
+        </div>
+
+        <div class="inst-logo">
+          <a href="https://www.polito.it" target="_blank" rel="noopener noreferrer"
+             aria-label="Politecnico di Torino">
+            <img src="logo_polito.png" alt="Politecnico di Torino" />
+          </a>
+        </div>
+
+        <div class="inst-logo">
+          <a href="https://www.comau.com/it" target="_blank" rel="noopener noreferrer"
+             aria-label="Comau">
+            <img src="comau_logo.png" alt="Comau" />
+          </a>
+        </div>
+
+      </div>
+
+      <div class="footer-address">
+        <p class="lab-name">VANDAL Laboratory</p>
+        <p>
+          Department of Control and Computer Engineering<br>
+          Politecnico di Torino<br>
+          Turin, Italy
+        </p>
+      </div>
+
+      <p class="footer-copy">
+        &copy; <span id="year"></span> VANDAL Lab, Politecnico di Torino. All rights reserved.
+      </p>
+
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

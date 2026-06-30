@@ -260,7 +260,8 @@
       background: #000;
     }
 
-    .video-wrapper video {
+    .video-wrapper video,
+    .video-wrapper iframe {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -497,19 +498,22 @@
 
   <section id="video">
     <div class="section-inner">
-     
+       
       <h2 class="section-title">Project Video</h2>
       <p class="video-description">
         Overview of the MultiGraspNet project, including the full pipeline
         and a demo in real-world.
       </p>
-
+  
       <div class="video-wrapper">
-        <video controls poster="">
-          <source src="RAL_camera-ready_60.mp4" type="video/mp4" />
-          Your browser does not support the HTML5 video element.
-        </video>
+        <iframe src="https://www.youtube.com/embed/wgP3wdu8seU" 
+                title="[IEEE RA-L 2026] A Multitask 3D Vision Model for Multi-gripper Robotic Grasping" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+        </iframe>
       </div>
+      
     </div>
   </section>
 

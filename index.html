@@ -335,6 +335,65 @@
 
     .contact-email-btn svg { width: 16px; height: 16px; }
 
+    /* ── Citation ────────────────────────────────────────────────── */
+    #citation {
+      background: var(--grey-50);
+      border-top: 1px solid var(--grey-200);
+      padding: 72px 48px;
+    }
+
+    .citation-description {
+      color: var(--grey-500);
+      font-size: 0.94rem;
+      margin-bottom: 24px;
+    }
+
+    .bibtex-wrapper {
+      position: relative;
+      background: var(--grey-800);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 32px rgba(0, 47, 108, 0.12);
+    }
+
+    .bibtex-code {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.88rem;
+      color: #E2E8F0;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .copy-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
     /* ── Footer ─────────────────────────────────────────────────── */
     footer {
       background: var(--polito-navy);
@@ -572,6 +631,36 @@
       <p class="ack-text">
         This work was supported by Comau S.p.A. The authors would like to thank Giovanni Di Stefano, Simone Panicucci, Nicola Longo, Luca Di Ruscio, Luca Robbiano, and Simone Peirone for their valuable assistance. This study was carried out within the FAIR - Future Artificial Intelligence Research and received funding from the European Union Next-GenerationEU (PIANO NAZIONALE DI RIPRESA E RESILIENZA (PNRR) – MISSIONE 4 COMPONENTE 2, INVESTIMENTO 1.3 – D.D. 1555 11/10/2022, PE00000013). This manuscript reflects only the authors’ views and opinions, neither the European Union nor the European Commission can be considered responsible for them. We thank the anonymous reviewers and editor for their constructive comments and suggestions.
       </p>
+    </div>
+  </section>
+
+    <section id="citation">
+    <div class="section-inner">
+      <span class="section-label">BibTeX</span>
+      <h2 class="section-title">Citation</h2>
+      <p class="citation-description">
+        If you find this work or code useful for your research, please consider citing our paper:
+      </p>
+
+      <div class="bibtex-wrapper">
+        <button class="copy-btn" onclick="copyBibtex()" id="copy-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span id="copy-btn-text">Copy</span>
+        </button>
+        <pre class="bibtex-code"><code id="bibtex-text">@ARTICLE{11631852,
+  author={Ortuno-Chanelo, Stephany and Rabino, Paolo and Civitelli, Enrico and Tommasi, Tatiana and Camoriano, Raffaello},
+  journal={IEEE Robotics and Automation Letters}, 
+  title={MultiGraspNet: A Multitask 3D Vision Model for Multi-Gripper Robotic Grasping}, 
+  year={2026},
+  volume={11},
+  number={9},
+  pages={10919-10926},
+  keywords={Grasping;Grippers;Modeling;Multitasking;Learning (artificial intelligence);End effectors;Training;Switches;Weighted sum model;Clouds;Robotic grasping;multi-gripper grasping;3D perception;multitask learning},
+  doi={10.1109/LRA.2026.3719235}}</code></pre>
+      </div>
     </div>
   </section>
 
